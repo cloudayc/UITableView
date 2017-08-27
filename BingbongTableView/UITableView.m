@@ -1,10 +1,26 @@
-//
-//  UITableView.m
-//  Bingbong
-//
-//  Created by wyq.Cloudayc on 25/08/2017.
-//  Copyright © 2017 Cloudayc. All rights reserved.
-//
+/*
+ MIT License
+ 
+ Copyright (c) 2017 cloudayc
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ 
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ */
 
 #import "UITableView.h"
 
@@ -15,6 +31,8 @@ static const NSString * const UITableViewColumenIdentifier = @"UITableViewColume
 
 @property (nonatomic, strong) NSTableView *tableView;
 
+@property (nonatomic, strong) NSMutableArray *columnList;
+
 @end
 
 @implementation UITableView
@@ -23,7 +41,7 @@ static const NSString * const UITableViewColumenIdentifier = @"UITableViewColume
 {
     if (self = [super initWithFrame:frameRect]) {
         [self initContent];
-        _tableView.frame = frameRect;
+        [self updateLayoutWithFrame:frameRect];
     }
     return self;
 }
@@ -49,7 +67,20 @@ static const NSString * const UITableViewColumenIdentifier = @"UITableViewColume
 - (void)setFrame:(NSRect)frame
 {
     [super setFrame:frame];
+    [self updateLayoutWithFrame:frame];
+}
+
+- (void)updateLayoutWithFrame:(CGRect)frame
+{
     self.tableView.frame = CGRectMake(0.f, 0.f, frame.size.width, frame.size.height);
+}
+
+- (void)updateColumnWithFrame:(CGRect)frame
+{
+    CGFloat columnWidth = frame.size.width / _columnList.count;
+    for (NSTableColumn *column in _columnList) {
+        column.width = columnWidth;
+    }
 }
 
 - (void)setDataSource:(id<UITableViewDataSource>)dataSource
@@ -61,12 +92,15 @@ static const NSString * const UITableViewColumenIdentifier = @"UITableViewColume
 
 - (void)initColumn
 {
-    /* get column from data source */
-    NSTableColumn *columen0     = [[NSTableColumn alloc] initWithIdentifier:@"0"];
-    columen0.title = @"";
-    [_tableView addTableColumn:columen0];
+    /* TODO: get column from data source */
+    NSTableColumn *column0     = [[NSTableColumn alloc] initWithIdentifier:@"0"];
+    column0.title = @"";
+    [_tableView addTableColumn:column0];
+    
+    [self updateColumnWithFrame:_tableView.frame];
 }
 
+#pragma mark - NSTableView data source
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView{
     if ([self.dataSource respondsToSelector:@selector(tableView:numberOfRowsInSection:)]) {
@@ -92,13 +126,6 @@ static const NSString * const UITableViewColumenIdentifier = @"UITableViewColume
         return [self.dataSource tableView:_tableView heightForRowAtIndexPath:indexPath];
     }
     return 44;
-}
-
-
-- (void)drawRect:(NSRect)dirtyRect {
-    [super drawRect:dirtyRect];
-    
-    // Drawing code here.
 }
 
 @end
